@@ -3,11 +3,13 @@
  * 提供跨模块共享的通用业务逻辑功能
  */
 
-import { BuildingType, TechnologyType } from '@/types/game'
-import type { Planet, Resources, Officer, BuildingConfig, TechnologyConfig } from '@/types/game'
+import { BuildingType, TechnologyType, ShipType, DefenseType } from '@/types/game'
+import type { Planet, Resources, Officer, BuildingConfig, TechnologyConfig, Player } from '@/types/game'
 import { OfficerType } from '@/types/game'
 import * as officerLogic from '@/logic/officerLogic'
 import * as resourceLogic from '@/logic/resourceLogic'
+import { scaleResources } from '@/utils/speed'
+import { BUILDINGS, TECHNOLOGIES, SHIPS, DEFENSES } from '@/config/gameConfig'
 
 /**
  * 获取特定等级的升级条件
@@ -93,11 +95,12 @@ export const checkRequirements = (
  * @param officers 玩家的军官对象
  * @returns 每小时各类资源的产量
  */
-export const getResourceProduction = (planet: Planet, officers: Record<OfficerType, Officer>): Resources => {
+export const getResourceProduction = (planet: Planet, officers: Record<OfficerType, Officer>, resourceSpeed: number = 1): Resources => {
   // 计算当前激活的军官加成
   const bonuses = officerLogic.calculateActiveBonuses(officers, Date.now())
   // 根据建筑等级和军官加成计算资源产量
-  return resourceLogic.calculateResourceProduction(planet, bonuses)
+  const base = resourceLogic.calculateResourceProduction(planet, bonuses)
+  return scaleResources(base, resourceSpeed)
 }
 
 /**
@@ -117,28 +120,148 @@ export const getResourceCapacity = (planet: Planet, officers: Record<OfficerType
  * 计算最大建造队列数量
  * @param planet 星球对象
  * @param additionalBuildQueue 军官提供的额外队列数量
- * @returns 最大建造队列数量（基础1个 + 纳米工厂等级 + 军官加成，最多10个）
+ * @returns 最大建造队列数量（基础3个 + 纳米工厂等级 + 军官加成，最多10个）
  */
 export const getMaxBuildQueue = (planet: Planet, additionalBuildQueue: number = 0): number => {
   const naniteFactoryLevel = planet.buildings[BuildingType.NaniteFactory] || 0
-  return Math.min(1 + naniteFactoryLevel + additionalBuildQueue, 10)
+  return Math.min(3 + naniteFactoryLevel + additionalBuildQueue, 10)
 }
 
 /**
  * 计算最大研究队列数量
  * @param technologies 已研究的科技等级
- * @returns 最大研究队列数量（基础1个 + 计算机技术等级，最多10个）
+ * @returns 最大研究队列数量（基础3个 + 计算机技术等级，最多10个）
  */
 export const getMaxResearchQueue = (technologies: Partial<Record<TechnologyType, number>>): number => {
   const computerTechLevel = technologies[TechnologyType.ComputerTechnology] || 0
-  return Math.min(1 + computerTechLevel, 10)
+  return Math.min(3 + computerTechLevel, 10)
 }
 
 /**
  * 计算最大舰队任务数量
  * @param additionalFleetSlots 军官提供的额外槽位数量
- * @returns 最大舰队任务数量（基础1个 + 军官加成，最多10个）
+ * @param computerTechnologyLevel 计算机技术等级
+ * @returns 最大舰队任务数量（基础3个 + 计算机技术等级 + 军官加成，最多20个）
  */
-export const getMaxFleetMissions = (additionalFleetSlots: number = 0): number => {
-  return Math.min(1 + additionalFleetSlots, 10)
+export const getMaxFleetMissions = (additionalFleetSlots: number = 0, computerTechnologyLevel: number = 0): number => {
+  return Math.min(3 + computerTechnologyLevel + additionalFleetSlots, 20)
+}
+
+/**
+ * 计算建筑的总成本（从等级1到目标等级的累计成本）
+ * @param buildingType 建筑类型
+ * @param level 目标等级
+ * @returns 总资源成本（金属+水晶+重氢）
+ */
+const calculateBuildingTotalCost = (buildingType: BuildingType, level: number): number => {
+  if (level <= 0) return 0
+
+  const config = BUILDINGS[buildingType]
+  if (!config) return 0
+
+  let totalCost = 0
+  const { baseCost, costMultiplier } = config
+
+  // 累加从等级1到目标等级的所有成本
+  for (let i = 1; i <= level; i++) {
+    const levelCost = {
+      metal: Math.floor(baseCost.metal * Math.pow(costMultiplier, i - 1)),
+      crystal: Math.floor(baseCost.crystal * Math.pow(costMultiplier, i - 1)),
+      deuterium: Math.floor(baseCost.deuterium * Math.pow(costMultiplier, i - 1))
+    }
+    totalCost += levelCost.metal + levelCost.crystal + levelCost.deuterium
+  }
+
+  return totalCost
+}
+
+/**
+ * 计算科技的总成本（从等级1到目标等级的累计成本）
+ * @param techType 科技类型
+ * @param level 目标等级
+ * @returns 总资源成本（金属+水晶+重氢）
+ */
+const calculateTechnologyTotalCost = (techType: TechnologyType, level: number): number => {
+  if (level <= 0) return 0
+
+  const config = TECHNOLOGIES[techType]
+  if (!config) return 0
+
+  let totalCost = 0
+  const { baseCost, costMultiplier } = config
+
+  // 累加从等级1到目标等级的所有成本
+  for (let i = 1; i <= level; i++) {
+    const levelCost = {
+      metal: Math.floor(baseCost.metal * Math.pow(costMultiplier, i - 1)),
+      crystal: Math.floor(baseCost.crystal * Math.pow(costMultiplier, i - 1)),
+      deuterium: Math.floor(baseCost.deuterium * Math.pow(costMultiplier, i - 1))
+    }
+    totalCost += levelCost.metal + levelCost.crystal + levelCost.deuterium
+  }
+
+  return totalCost
+}
+
+/**
+ * 计算单个舰船的成本
+ * @param shipType 舰船类型
+ * @returns 单个舰船的资源成本（金属+水晶+重氢）
+ */
+const calculateShipUnitCost = (shipType: ShipType): number => {
+  const config = SHIPS[shipType]
+  if (!config) return 0
+
+  return config.cost.metal + config.cost.crystal + config.cost.deuterium
+}
+
+/**
+ * 计算单个防御的成本
+ * @param defenseType 防御类型
+ * @returns 单个防御的资源成本（金属+水晶+重氢）
+ */
+const calculateDefenseUnitCost = (defenseType: DefenseType): number => {
+  const config = DEFENSES[defenseType]
+  if (!config) return 0
+
+  return config.cost.metal + config.cost.crystal + config.cost.deuterium
+}
+
+/**
+ * 计算玩家的总积分
+ * 积分规则：(建筑成本 + 科技成本 + 舰队成本 + 防御成本) / 1000
+ * @param player 玩家对象
+ * @returns 玩家总积分
+ */
+export const calculatePlayerPoints = (player: Player): number => {
+  let totalCost = 0
+
+  // 1. 计算所有星球的建筑成本
+  player.planets.forEach(planet => {
+    Object.entries(planet.buildings).forEach(([buildingType, level]) => {
+      totalCost += calculateBuildingTotalCost(buildingType as BuildingType, level)
+    })
+  })
+
+  // 2. 计算科技成本
+  Object.entries(player.technologies).forEach(([techType, level]) => {
+    totalCost += calculateTechnologyTotalCost(techType as TechnologyType, level)
+  })
+
+  // 3. 计算所有星球的舰队成本
+  player.planets.forEach(planet => {
+    Object.entries(planet.fleet).forEach(([shipType, count]) => {
+      totalCost += calculateShipUnitCost(shipType as ShipType) * count
+    })
+  })
+
+  // 4. 计算所有星球的防御成本
+  player.planets.forEach(planet => {
+    Object.entries(planet.defense).forEach(([defenseType, count]) => {
+      totalCost += calculateDefenseUnitCost(defenseType as DefenseType) * count
+    })
+  })
+
+  // 每1000资源 = 1积分
+  return Math.floor(totalCost / 1000)
 }

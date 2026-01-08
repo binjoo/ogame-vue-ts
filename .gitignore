@@ -11,8 +11,9 @@ CLAUDE.md
 node_modules
 dist
 dist-ssr
-*.local
+dist-electron
 docs
+*.local
 
 # Editor directories and files
 .claude/*
@@ -25,3 +26,14 @@ docs
 *.njsproj
 *.sln
 *.sw?
+/docs
+/docs/assets
+
+# Android build outputs
+android/.gradle
+android/app/build
+android/build
+android/local.properties
+android/.idea
+android/*.iml
+android/app/*.iml

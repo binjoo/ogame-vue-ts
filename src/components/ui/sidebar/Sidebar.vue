@@ -8,7 +8,7 @@
     <slot />
   </div>
 
-  <Sheet v-else-if="isMobile" :open="openMobile" v-bind="$attrs" @update:open="setOpenMobile">
+  <Sheet v-else-if="isMobile" :open="openMobile" v-bind="$attrs" @update:open="handleOpenMobileChange">
     <SheetContent
       data-sidebar="sidebar"
       data-slot="sidebar"
@@ -79,12 +79,14 @@
 
 <script setup lang="ts">
   import type { SidebarProps } from '.'
+  import { watch } from 'vue'
   import { cn } from '@/lib/utils'
   import { Sheet, SheetContent } from '@/components/ui/sheet'
   import SheetDescription from '@/components/ui/sheet/SheetDescription.vue'
   import SheetHeader from '@/components/ui/sheet/SheetHeader.vue'
   import SheetTitle from '@/components/ui/sheet/SheetTitle.vue'
   import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils'
+  import { useRouter } from 'vue-router'
 
   defineOptions({
     inheritAttrs: false
@@ -96,5 +98,21 @@
     collapsible: 'offcanvas'
   })
 
+  const router = useRouter()
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+
+  // 处理移动端侧边栏打开/关闭
+  const handleOpenMobileChange = (open: boolean) => {
+    setOpenMobile(open)
+  }
+
+  // 监听路由变化，在移动端关闭侧边栏
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      if (isMobile.value && openMobile.value) {
+        setOpenMobile(false)
+      }
+    }
+  )
 </script>

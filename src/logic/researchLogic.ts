@@ -3,6 +3,9 @@ import { TechnologyType, BuildingType } from '@/types/game'
 import { TECHNOLOGIES } from '@/config/gameConfig'
 import * as pointsLogic from './pointsLogic'
 
+// 用于生成唯一ID的计数器
+let researchQueueIdCounter = 0
+
 /**
  * 计算科技研究成本
  */
@@ -20,12 +23,31 @@ export const calculateTechnologyCost = (techType: TechnologyType, targetLevel: n
 
 /**
  * 计算科技研究时间
+ * @param techType 科技类型
+ * @param currentLevel 当前等级
+ * @param researchSpeedBonus 军官等提供的研究速度加成百分比
+ * @param researchLabLevel 研究实验室等级
+ * @param energyTechLevel 能源技术等级
  */
-export const calculateTechnologyTime = (techType: TechnologyType, currentLevel: number, researchSpeedBonus: number = 0): number => {
+export const calculateTechnologyTime = (
+  techType: TechnologyType,
+  currentLevel: number,
+  researchSpeedBonus: number = 0,
+  researchLabLevel: number = 1,
+  energyTechLevel: number = 0
+): number => {
   const config = TECHNOLOGIES[techType]
   const baseTime = config.baseTime * Math.pow(config.costMultiplier, currentLevel)
+
+  // 研究实验室和能源技术的加速：研究时间 / (研究实验室等级 × (1 + 能源技术等级))
+  // 研究实验室等级至少为1，防止除以0
+  const labLevel = Math.max(1, researchLabLevel)
+  const techSpeedDivisor = labLevel * (1 + energyTechLevel)
+
+  // 军官等的百分比加成
   const speedMultiplier = 1 - researchSpeedBonus / 100
-  return Math.floor(baseTime * speedMultiplier)
+
+  return Math.floor((baseTime / techSpeedDivisor) * speedMultiplier)
 }
 
 /**
@@ -58,8 +80,9 @@ export const checkTechnologyRequirements = (
  */
 export const createResearchQueueItem = (techType: TechnologyType, targetLevel: number, researchTime: number): BuildQueueItem => {
   const now = Date.now()
+  researchQueueIdCounter++
   return {
-    id: `research_${now}`,
+    id: `research_${now}_${researchQueueIdCounter}`,
     type: 'technology',
     itemType: techType,
     targetLevel,
@@ -75,13 +98,15 @@ export const completeResearchQueue = (
   researchQueue: BuildQueueItem[],
   technologies: Partial<Record<TechnologyType, number>>,
   now: number,
-  onPointsEarned?: (points: number, type: 'technology', itemType: string, level: number) => void
+  onPointsEarned?: (points: number, type: 'technology', itemType: string, level: number) => void,
+  onCompleted?: (type: 'technology', itemType: string, level: number) => void
 ): BuildQueueItem[] => {
   return researchQueue.filter(item => {
     if (now >= item.endTime) {
       // 研究完成
       const oldLevel = technologies[item.itemType as TechnologyType] || 0
-      const newLevel = item.targetLevel || 0
+      // 研究完成时，等级+1（而不是直接使用targetLevel，保持一致性）
+      const newLevel = oldLevel + 1
       technologies[item.itemType as TechnologyType] = newLevel
 
       // 计算并累积积分
@@ -89,6 +114,12 @@ export const completeResearchQueue = (
         const points = pointsLogic.calculateTechnologyPoints(item.itemType as TechnologyType, oldLevel, newLevel)
         onPointsEarned(points, 'technology', item.itemType, newLevel)
       }
+
+      // 通知完成
+      if (onCompleted) {
+        onCompleted('technology', item.itemType, newLevel)
+      }
+
       return false
     }
     return true

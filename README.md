@@ -5,13 +5,11 @@
 
   一个基于 Vue 3 和 TypeScript 构建的现代化 OGame 太空策略游戏。
 
-  [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-  [![Vue 3](https://img.shields.io/badge/Vue-3.5-brightgreen.svg)](https://vuejs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-  [![Vite](https://img.shields.io/badge/Vite-7.2-646CFF.svg)](https://vitejs.dev/)
-  [![Go](https://img.shields.io/badge/Go-1.25-79D4FD.svg)](https://golang.org/)
-
-  [English](README-EN.md) | 简体中文
+  [![GitHub Release](https://img.shields.io/github/v/release/setube/ogame-vue-ts?style=flat&logo=github&label=Release)](https://github.com/setube/ogame-vue-ts/releases/latest)
+  [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0)
+  [![Tap Tap](https://img.shields.io/badge/TapTap-OGame%20Vue%20Ts-18d6e0)](https://www.taptap.cn/app/801190)
+  
+  简体中文 | [繁體中文](README-zh-TW.md) | [English](README-EN.md) | [Deutsch](README-DE.md) | [Русский](README-RU.md) | [Español](README-ES.md) | [한국어](README-KO.md) | [日本語](README-JA.md)
 
 </div>
 
@@ -21,7 +19,6 @@ OGame Vue TS 是一款受经典 OGame 游戏启发的单机版、基于浏览器
 
 ## 核心特性
 
-- **多语言支持** - 支持 6 种语言：英语、简体中文、繁体中文、德语、俄语和韩语
 - **建筑管理** - 在行星和月球上建造和升级各种建筑
 - **科技研究** - 解锁先进科技来增强你的帝国
 - **舰队管理** - 建造舰船、派遣任务、参与战术太空战斗
@@ -36,46 +33,24 @@ OGame Vue TS 是一款受经典 OGame 游戏启发的单机版、基于浏览器
 
 ## 技术栈
 
-- **前端框架:** [Vue 3](https://vuejs.org/) + Composition API (`<script setup>` 语法)
-- **开发语言:** [TypeScript](https://www.typescriptlang.org/) (启用严格类型检查)
-- **构建工具:** [Vite](https://vitejs.dev/) (自定义 Rolldown-Vite 7.2.5)、[Golang](https://golang.org/)(构建跨平台的Web服务端)、[Electron](https://www.electronjs.org/)(构建跨平台可视化界面)
-- **状态管理:** [Pinia](https://pinia.vuejs.org/) + 持久化插件
-- **路由管理:** [Vue Router 4](https://router.vuejs.org/)
-- **UI 组件:** [shadcn-vue](https://www.shadcn-vue.com/) (New York 风格)
-- **样式方案:** [Tailwind CSS v4](https://tailwindcss.com/) + CSS 变量
-- **图标库:** [Lucide Vue Next](https://lucide.dev/)
+- **前端框架:** [Vue 3](https://vuejs.org) + Composition API (`<script setup>` 语法)
+- **开发语言:** [TypeScript](https://www.typescriptlang.org) (启用严格类型检查)
+- **构建工具:** [Vite](https://vitejs.dev) (自定义 Rolldown-Vite 7.2.5)、[Golang](https://golang.org)(构建跨平台的Web服务端)、[Electron](https://www.electronjs.org)(构建跨平台可视化界面)
+- **状态管理:** [Pinia](https://pinia.vuejs.org) + 持久化插件
+- **路由管理:** [Vue Router 4](https://router.vuejs.org)
+- **UI 组件:** [shadcn-vue](https://www.shadcn-vue.com) (New York 风格)
+- **样式方案:** [Tailwind CSS v4](https://tailwindcss.com) + CSS 变量
+- **图标库:** [Lucide Vue Next](https://lucide.dev)
 - **动画效果:** [tw-animate-css](https://www.npmjs.com/package/tw-animate-css)
 - **国际化:** 自定义 i18n 实现
 
 ## 快速开始
 
-### 下载构建版本
-
-#### 服务端
-
-[Windows](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-windows-amd64.exe)
-
-[Linux amd64](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-linux-amd64)
-
-[Linux arm64](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-linux-arm64)
-
-[MacOS Intel](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-macos-amd64)
-
-[MacOS](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-macos-arm64)
-
-#### 桌面版
-
-[Windows](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame.Setup.exe)
-
-[Ubuntu](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame.AppImage)
-
-[MacOS](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame-mac.dmg)
-
 ### 环境要求
 
-- [Node.js](https://nodejs.org/) (推荐 18 或更高版本)
-- [pnpm](https://pnpm.io/) (版本 10.13.1 或更高)
-- [Go](https://golang.org/) (版本 1.21 或更高版本)(可选)
+- [Node.js](https://nodejs.org) (推荐 18 或更高版本)
+- [pnpm](https://pnpm.io) (版本 10.13.1 或更高)
+- [Go](https://golang.org) (版本 1.21 或更高版本)(可选)
 
 ### 安装
 
@@ -109,98 +84,6 @@ pnpm build
 pnpm preview
 ```
 
-## 项目结构
-
-```
-ogame-vue-ts/
-├── public/               # 静态资源
-│   └── logo.svg         # 应用图标
-├── src/
-│   ├── assets/          # 动态资源
-│   ├── components/      # Vue 组件
-│   │   └── ui/         # shadcn-vue UI 组件
-│   ├── composables/    # Vue 组合式函数
-│   ├── config/         # 游戏配置
-│   ├── lib/            # 工具库
-│   ├── locales/        # 国际化翻译文件
-│   ├── logic/          # 游戏逻辑模块
-│   │   ├── buildingLogic.ts      # 建筑逻辑
-│   │   ├── buildingValidation.ts # 建筑验证
-│   │   ├── fleetLogic.ts         # 舰队逻辑
-│   │   ├── moonLogic.ts          # 月球逻辑
-│   │   ├── moonValidation.ts     # 月球验证
-│   │   ├── researchLogic.ts      # 研究逻辑
-│   │   ├── researchValidation.ts # 研究验证
-│   │   ├── shipLogic.ts          # 舰船逻辑
-│   │   └── shipValidation.ts     # 舰船验证
-│   ├── router/         # Vue Router 路由配置
-│   ├── stores/         # Pinia 状态存储
-│   ├── types/          # TypeScript 类型定义
-│   ├── utils/          # 工具函数
-│   ├── views/          # 页面组件
-│   │   ├── OverviewView.vue        # 概览页面
-│   │   ├── BuildingsView.vue       # 建筑页面
-│   │   ├── ResearchView.vue        # 研究页面
-│   │   ├── ShipyardView.vue        # 船坞页面
-│   │   ├── DefenseView.vue         # 防御页面
-│   │   ├── FleetView.vue           # 舰队页面
-│   │   ├── GalaxyView.vue          # 银河页面
-│   │   ├── OfficersView.vue        # 军官页面
-│   │   ├── BattleSimulatorView.vue # 战斗模拟器
-│   │   ├── MessagesView.vue        # 消息页面
-│   │   └── SettingsView.vue        # 设置页面
-│   ├── App.vue         # 根组件
-│   ├── main.ts         # 应用入口
-│   └── style.css       # 全局样式
-├── .github/
-│   └── ISSUE_TEMPLATE/ # GitHub issue 模板
-├── LICENSE             # CC BY-NC 4.0 许可证
-├── package.json        # 项目依赖
-├── tsconfig.json       # TypeScript 配置
-└── vite.config.ts      # Vite 配置
-```
-
-## 支持的语言
-
-- 🇺🇸 English (英语)
-- 🇨🇳 简体中文
-- 🇹🇼 繁體中文
-- 🇩🇪 Deutsch (德语)
-- 🇷🇺 Русский (俄语)
-- 🇰🇷 한국어 (韩语)
-
-## 游戏特性
-
-### 资源管理
-- **金属** - 主要建筑材料
-- **晶体** - 高级科技组件
-- **重氢** - 燃料和研究资源
-- **暗物质** - 高级资源
-- **能量** - 为设施供电
-
-### 建筑类型
-- **资源建筑** - 金属矿、晶体矿、重氢合成器、太阳能发电厂
-- **设施建筑** - 机器人工厂、船坞、研究实验室、仓储设施
-- **特殊建筑** - 纳米机器人工厂、行星改造器等
-
-### 科技系统
-- **能量技术** - 提高能量效率
-- **激光技术** - 增强武器系统
-- **离子技术** - 高级推进和武器
-- **超空间技术** - 实现更快的旅行
-- **等离子技术** - 终极武器系统
-- 还有更多...
-
-### 舰船类别
-- **民用舰船** - 小型/大型货船、殖民船、回收船
-- **战斗舰船** - 轻型/重型战斗机、巡洋舰、战列舰、轰炸机
-- **特殊舰船** - 死星、战列巡洋舰、毁灭者
-
-### 防御系统
-- 火箭发射器、轻型/重型激光炮、高斯炮
-- 离子炮、等离子炮塔
-- 小型/大型防护罩
-
 ## 数据安全
 
 所有游戏数据在存储到浏览器的本地存储之前都会使用 AES 加密自动加密。您的游戏进度是安全且私密的。
@@ -213,16 +96,9 @@ ogame-vue-ts/
 
 欢迎贡献！请随时提交 issue 或 pull request。
 
-### Issue 模板
-我们提供以下中英文 issue 模板：
-- BUG反馈 / Bug Report
-- 功能请求 / Feature Request
-- 文档改进 / Documentation Improvement
-- 反馈建议 / Feedback & Suggestion
-
 ## 许可证
 
-本作品采用 [知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc/4.0/) 进行许可。
+本作品采用 [知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc/4.0) 进行许可。
 
 ### 您可以自由地：
 - **共享** — 在任何媒介以任何形式复制、发行本作品
@@ -234,7 +110,7 @@ ogame-vue-ts/
 
 ## 致谢
 
-本项目受原版 [OGame](https://ogame.org/) 浏览器游戏启发。所有游戏机制和设计元素都是为了教育和娱乐目的而重新实现的。
+本项目受原版 [OGame](https://ogame.org) 浏览器游戏启发。所有游戏机制和设计元素都是为了教育和娱乐目的而重新实现的。
 
 ## 免责声明
 
@@ -243,7 +119,7 @@ ogame-vue-ts/
 ---
 
 <div align="center">
-  用 ❤️ 制作，作者：谦君
+  用 ❤️ 制作，作者：<a href="https://github.com/setube">setube</a>
   <br>
   © 2025 - 保留所有权利（除 CC BY-NC 4.0 许可证授予的权利外）
 </div>

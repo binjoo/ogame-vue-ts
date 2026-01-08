@@ -9,10 +9,13 @@
       <p class="text-xs sm:text-sm text-muted-foreground">
         {{ t('planet.position') }}: [{{ planet.position.galaxy }}:{{ planet.position.system }}:{{ planet.position.position }}]
       </p>
+      <!-- 温度信息 -->
+      <p v-if="planet.temperature && !planet.isMoon" class="text-xs sm:text-sm text-muted-foreground">
+        {{ t('planet.temperature') }}: {{ planet.temperature.min }}°C {{ t('common.to') }} {{ planet.temperature.max }}°C
+      </p>
       <!-- 月球信息 -->
       <div v-if="!planet.isMoon && moon" class="mt-2">
         <Button @click="switchToMoon" variant="outline" size="sm">
-          <span class="mr-2">🌙</span>
           {{ t('planet.switchToMoon') }}
         </Button>
       </div>
@@ -21,160 +24,152 @@
       </div>
     </div>
 
-    <!-- 资源显示 -->
+    <!-- 资源管理 -->
     <Card>
       <CardHeader>
         <CardTitle>{{ t('overview.resourceOverview') }}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{{ t('common.resourceType') }}</TableHead>
-              <TableHead class="text-right">{{ t('resources.current') }}</TableHead>
-              <TableHead class="text-right">{{ t('resources.max') }}</TableHead>
-              <TableHead class="text-right">{{ t('resources.production') }}{{ t('resources.perHour') }}</TableHead>
-              <TableHead class="text-right">{{ t('resources.consumption') }}{{ t('resources.perHour') }}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="resourceType in resourceTypes" :key="resourceType.key">
-              <TableCell class="font-medium">
-                <div class="flex items-center gap-2">
+        <Tabs default-value="overview" class="w-full">
+          <TabsList class="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">{{ t('overview.tabOverview') }}</TabsTrigger>
+            <TabsTrigger value="production">{{ t('overview.tabProduction') }}</TabsTrigger>
+            <TabsTrigger value="consumption">{{ t('overview.tabConsumption') }}</TabsTrigger>
+          </TabsList>
+          <!-- 概览标签页 -->
+          <TabsContent value="overview" class="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{{ t('common.resourceType') }}</TableHead>
+                  <TableHead class="text-right">{{ t('resources.current') }}</TableHead>
+                  <TableHead class="text-right">{{ t('resources.max') }}</TableHead>
+                  <TableHead class="text-right">{{ t('resources.production') }}{{ t('resources.perHour') }}</TableHead>
+                  <TableHead class="text-right">{{ t('resources.consumption') }}{{ t('resources.perHour') }}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow v-for="resourceType in resourceTypes" :key="resourceType.key">
+                  <TableCell class="font-medium">
+                    <div class="flex items-center gap-2">
+                      <ResourceIcon :type="resourceType.key" size="sm" />
+                      {{ t(`resources.${resourceType.key}`) }}
+                    </div>
+                  </TableCell>
+                  <TableCell
+                    class="text-right"
+                    :class="getResourceColor(planet.resources[resourceType.key], capacity?.[resourceType.key] || Infinity)"
+                  >
+                    {{ formatNumber(planet.resources[resourceType.key]) }}
+                  </TableCell>
+                  <TableCell class="text-right text-muted-foreground">
+                    {{ formatNumber(capacity?.[resourceType.key] || 0) }}
+                  </TableCell>
+                  <TableCell class="text-right text-green-600 dark:text-green-400">
+                    +{{ formatNumber(production?.[resourceType.key] || 0) }}
+                  </TableCell>
+                  <TableCell class="text-right text-red-600 dark:text-red-400">
+                    <template v-if="resourceType.key === 'energy'">-{{ formatNumber(energyConsumption) }}</template>
+                    <template v-else>-</template>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TabsContent>
+
+          <!-- 产量详情标签页 -->
+          <TabsContent value="production" class="mt-4">
+            <div class="space-y-4">
+              <div v-for="resourceType in resourceTypes" :key="resourceType.key" class="border-b last:border-b-0 pb-4 last:pb-0">
+                <div class="flex items-center gap-2 mb-2">
                   <ResourceIcon :type="resourceType.key" size="sm" />
-                  {{ t(`resources.${resourceType.key}`) }}
+                  <span class="font-semibold">{{ t(`resources.${resourceType.key}`) }}</span>
                 </div>
-              </TableCell>
-              <!-- 所有资源统一显示 -->
-              <TableCell
-                class="text-right"
-                :class="getResourceColor(planet.resources[resourceType.key], capacity?.[resourceType.key] || Infinity)"
+
+                <div v-if="productionBreakdown" class="ml-6 space-y-1 text-sm">
+                  <!-- 电力有多个来源 -->
+                  <template v-if="resourceType.key === 'energy' && productionBreakdown.energy.sources">
+                    <div v-for="(source, idx) in productionBreakdown.energy.sources" :key="idx" class="flex justify-between">
+                      <span class="text-muted-foreground">
+                        {{ t(source.name) }}
+                        <template v-if="source.name.startsWith('buildings.')">({{ t('common.level') }} {{ source.level }})</template>
+                        <template v-else>({{ source.level }})</template>
+                      </span>
+                      <span class="text-green-600 dark:text-green-400">
+                        +{{ formatNumber(Math.floor(source.production)) }}/{{ t('resources.hour') }}
+                      </span>
+                    </div>
+                  </template>
+
+                  <!-- 其他资源单一建筑产量 -->
+                  <template v-else>
+                    <div class="flex justify-between">
+                      <span class="text-muted-foreground">
+                        {{ t(productionBreakdown[resourceType.key].buildingName) }}
+                        ({{ t('common.level') }} {{ productionBreakdown[resourceType.key].buildingLevel }})
+                      </span>
+                      <span class="text-green-600 dark:text-green-400">
+                        +{{ formatNumber(Math.floor(productionBreakdown[resourceType.key].baseProduction)) }}/{{ t('resources.hour') }}
+                      </span>
+                    </div>
+                  </template>
+
+                  <!-- 加成列表 -->
+                  <div v-for="(bonus, idx) in productionBreakdown[resourceType.key].bonuses" :key="idx" class="flex justify-between">
+                    <span class="text-muted-foreground ml-4">
+                      {{ t(bonus.name) }} ({{ bonus.percentage > 0 ? '+' : '' }}{{ bonus.percentage }}%)
+                    </span>
+                    <span :class="bonus.value > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                      {{ bonus.value > 0 ? '+' : '' }}{{ formatNumber(Math.floor(bonus.value)) }}/{{ t('resources.hour') }}
+                    </span>
+                  </div>
+
+                  <!-- 最终产量 -->
+                  <div class="flex justify-between font-semibold pt-1 border-t mt-1">
+                    <span>{{ t('overview.totalProduction') }}</span>
+                    <span class="text-green-600 dark:text-green-400">
+                      +{{ formatNumber(Math.floor(productionBreakdown[resourceType.key].finalProduction)) }}/{{ t('resources.hour') }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <!-- 消耗详情标签页 -->
+          <TabsContent value="consumption" class="mt-4">
+            <div class="space-y-2">
+              <!-- 各建筑消耗 -->
+              <div
+                v-for="consumptionType in consumptionTypes"
+                :key="consumptionType.key"
+                v-show="consumptionBreakdown && consumptionBreakdown[consumptionType.key].buildingLevel > 0"
+                class="flex justify-between text-sm"
               >
-                {{ formatNumber(planet.resources[resourceType.key]) }}
-              </TableCell>
-              <TableCell class="text-right text-muted-foreground">
-                {{ formatNumber(capacity?.[resourceType.key] || 0) }}
-              </TableCell>
-              <TableCell class="text-right text-green-600 dark:text-green-400">
-                +{{ formatNumber(production?.[resourceType.key] || 0) }}
-              </TableCell>
-              <TableCell class="text-right text-red-600 dark:text-red-400">
-                <template v-if="resourceType.key === 'energy'">
-                  -{{ formatNumber(energyConsumption) }}
-                </template>
-                <template v-else>
-                  -
-                </template>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-
-    <!-- 资源获取来源 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>{{ t('overview.productionSources') }}</CardTitle>
-        <CardDescription>{{ t('overview.productionSourcesDesc') }}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div v-for="resourceType in resourceTypes" :key="resourceType.key" class="border-b last:border-b-0 pb-4 last:pb-0">
-            <div class="flex items-center gap-2 mb-2">
-              <ResourceIcon :type="resourceType.key" size="sm" />
-              <span class="font-semibold">{{ t(`resources.${resourceType.key}`) }}</span>
-            </div>
-
-            <div v-if="productionBreakdown" class="ml-6 space-y-1 text-sm">
-              <!-- 建筑基础产量 -->
-              <div class="flex justify-between">
-                <span class="text-muted-foreground">
-                  {{ t(productionBreakdown[resourceType.key].buildingName) }}
-                  ({{ t('common.level') }} {{ productionBreakdown[resourceType.key].buildingLevel }})
+                <span v-if="consumptionBreakdown" class="text-muted-foreground">
+                  {{ t(consumptionBreakdown[consumptionType.key].buildingName) }}
+                  ({{ t('common.level') }} {{ consumptionBreakdown[consumptionType.key].buildingLevel }})
                 </span>
-                <span class="text-green-600 dark:text-green-400">
-                  +{{ formatNumber(Math.floor(productionBreakdown[resourceType.key].baseProduction)) }}/{{ t('resources.hour') }}
+                <span v-if="consumptionBreakdown" class="text-red-600 dark:text-red-400">
+                  -{{ formatNumber(Math.floor(consumptionBreakdown[consumptionType.key].consumption)) }}/{{ t('resources.hour') }}
                 </span>
               </div>
 
-              <!-- 加成列表 -->
-              <div v-for="(bonus, idx) in productionBreakdown[resourceType.key].bonuses" :key="idx" class="flex justify-between">
-                <span class="text-muted-foreground ml-4">
-                  {{ t(bonus.name) }}
-                </span>
-                <span :class="bonus.value > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
-                  {{ bonus.value > 0 ? '+' : '' }}{{ bonus.value }}%
+              <!-- 总消耗 -->
+              <div v-if="consumptionBreakdown" class="flex justify-between font-semibold pt-2 border-t">
+                <span>{{ t('overview.totalConsumption') }}</span>
+                <span class="text-red-600 dark:text-red-400">
+                  -{{ formatNumber(Math.floor(consumptionBreakdown.total)) }}/{{ t('resources.hour') }}
                 </span>
               </div>
 
-              <!-- 最终产量 -->
-              <div class="flex justify-between font-semibold pt-1 border-t mt-1">
-                <span>{{ t('overview.totalProduction') }}</span>
-                <span class="text-green-600 dark:text-green-400">
-                  +{{ formatNumber(Math.floor(productionBreakdown[resourceType.key].finalProduction)) }}/{{ t('resources.hour') }}
-                </span>
+              <!-- 无消耗提示 -->
+              <div v-if="consumptionBreakdown && consumptionBreakdown.total === 0" class="text-sm text-muted-foreground text-center py-2">
+                {{ t('overview.noConsumption') }}
               </div>
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- 资源消耗来源 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>{{ t('overview.consumptionSources') }}</CardTitle>
-        <CardDescription>{{ t('overview.consumptionSourcesDesc') }}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <!-- 金属矿消耗 -->
-          <div v-if="consumptionBreakdown && consumptionBreakdown.metalMine.buildingLevel > 0" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">
-              {{ t(consumptionBreakdown.metalMine.buildingName) }}
-              ({{ t('common.level') }} {{ consumptionBreakdown.metalMine.buildingLevel }})
-            </span>
-            <span class="text-red-600 dark:text-red-400">
-              -{{ formatNumber(Math.floor(consumptionBreakdown.metalMine.consumption)) }}/{{ t('resources.hour') }}
-            </span>
-          </div>
-
-          <!-- 晶体矿消耗 -->
-          <div v-if="consumptionBreakdown && consumptionBreakdown.crystalMine.buildingLevel > 0" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">
-              {{ t(consumptionBreakdown.crystalMine.buildingName) }}
-              ({{ t('common.level') }} {{ consumptionBreakdown.crystalMine.buildingLevel }})
-            </span>
-            <span class="text-red-600 dark:text-red-400">
-              -{{ formatNumber(Math.floor(consumptionBreakdown.crystalMine.consumption)) }}/{{ t('resources.hour') }}
-            </span>
-          </div>
-
-          <!-- 重氢合成器消耗 -->
-          <div v-if="consumptionBreakdown && consumptionBreakdown.deuteriumSynthesizer.buildingLevel > 0" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">
-              {{ t(consumptionBreakdown.deuteriumSynthesizer.buildingName) }}
-              ({{ t('common.level') }} {{ consumptionBreakdown.deuteriumSynthesizer.buildingLevel }})
-            </span>
-            <span class="text-red-600 dark:text-red-400">
-              -{{ formatNumber(Math.floor(consumptionBreakdown.deuteriumSynthesizer.consumption)) }}/{{ t('resources.hour') }}
-            </span>
-          </div>
-
-          <!-- 总消耗 -->
-          <div v-if="consumptionBreakdown" class="flex justify-between font-semibold pt-2 border-t">
-            <span>{{ t('overview.totalConsumption') }}</span>
-            <span class="text-red-600 dark:text-red-400">
-              -{{ formatNumber(Math.floor(consumptionBreakdown.total)) }}/{{ t('resources.hour') }}
-            </span>
-          </div>
-
-          <!-- 无消耗提示 -->
-          <div v-if="consumptionBreakdown && consumptionBreakdown.total === 0" class="text-sm text-muted-foreground text-center py-2">
-            {{ t('overview.noConsumption') }}
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
 
@@ -185,7 +180,7 @@
         <CardDescription>{{ t('overview.currentShips') }}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
           <div v-for="(count, shipType) in planet.fleet" :key="shipType">
             <p class="text-xs sm:text-sm text-muted-foreground">{{ SHIPS[shipType].name }}</p>
             <p class="text-lg sm:text-xl font-bold">{{ count }}</p>
@@ -202,40 +197,42 @@
   import { useGameConfig } from '@/composables/useGameConfig'
   import { computed } from 'vue'
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
   import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
   import { Button } from '@/components/ui/button'
   import { Badge } from '@/components/ui/badge'
-  import ResourceIcon from '@/components/ResourceIcon.vue'
+  import ResourceIcon from '@/components/common/ResourceIcon.vue'
   import { formatNumber, getResourceColor } from '@/utils/format'
+  import { scaleNumber } from '@/utils/speed'
   import type { Planet } from '@/types/game'
   import * as publicLogic from '@/logic/publicLogic'
   import * as resourceLogic from '@/logic/resourceLogic'
-  import * as officerLogic from '@/logic/officerLogic'
 
   const gameStore = useGameStore()
   const { t } = useI18n()
   const { SHIPS } = useGameConfig()
   const planet = computed(() => gameStore.currentPlanet)
-  const production = computed(() => (planet.value ? publicLogic.getResourceProduction(planet.value, gameStore.player.officers) : null))
+  const production = computed(() =>
+    planet.value ? publicLogic.getResourceProduction(planet.value, gameStore.player.officers, gameStore.gameSpeed) : null
+  )
   const capacity = computed(() => (planet.value ? publicLogic.getResourceCapacity(planet.value, gameStore.player.officers) : null))
 
   // 能量消耗
   const energyConsumption = computed(() => {
     if (!planet.value) return 0
-    return resourceLogic.calculateEnergyConsumption(planet.value)
+    return scaleNumber(resourceLogic.calculateEnergyConsumption(planet.value), gameStore.gameSpeed)
   })
 
   // 资源产量详细breakdown
   const productionBreakdown = computed(() => {
     if (!planet.value) return null
-    const bonuses = officerLogic.calculateActiveBonuses(gameStore.player.officers, Date.now())
-    return resourceLogic.calculateProductionBreakdown(planet.value, bonuses)
+    return resourceLogic.calculateProductionBreakdown(planet.value, gameStore.player.officers, Date.now(), gameStore.gameSpeed)
   })
 
   // 资源消耗详细breakdown
   const consumptionBreakdown = computed(() => {
     if (!planet.value) return null
-    return resourceLogic.calculateConsumptionBreakdown(planet.value)
+    return resourceLogic.calculateConsumptionBreakdown(planet.value, gameStore.gameSpeed)
   })
 
   // 资源类型配置
@@ -243,8 +240,27 @@
     { key: 'metal' as const },
     { key: 'crystal' as const },
     { key: 'deuterium' as const },
-    { key: 'darkMatter' as const },
-    { key: 'energy' as const }
+    { key: 'energy' as const },
+    { key: 'darkMatter' as const }
+  ]
+
+  // 消耗类型配置
+  const consumptionTypes = [
+    // 资源建筑
+    { key: 'metalMine' as const },
+    { key: 'crystalMine' as const },
+    { key: 'deuteriumSynthesizer' as const },
+    // 设施建筑
+    { key: 'roboticsFactory' as const },
+    { key: 'naniteFactory' as const },
+    { key: 'shipyard' as const },
+    { key: 'researchLab' as const },
+    { key: 'missileSilo' as const },
+    { key: 'terraformer' as const },
+    { key: 'darkMatterCollector' as const },
+    // 月球建筑
+    { key: 'sensorPhalanx' as const },
+    { key: 'jumpGate' as const }
   ]
 
   // 月球相关

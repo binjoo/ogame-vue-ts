@@ -25,19 +25,25 @@ export const useGameConfig = () => {
     [BuildingType.CrystalMine]: 'crystalMine',
     [BuildingType.DeuteriumSynthesizer]: 'deuteriumSynthesizer',
     [BuildingType.SolarPlant]: 'solarPlant',
+    [BuildingType.FusionReactor]: 'fusionReactor',
     [BuildingType.RoboticsFactory]: 'roboticsFactory',
     [BuildingType.NaniteFactory]: 'naniteFactory',
     [BuildingType.Shipyard]: 'shipyard',
+    [BuildingType.Hangar]: 'hangar',
     [BuildingType.ResearchLab]: 'researchLab',
     [BuildingType.MetalStorage]: 'metalStorage',
     [BuildingType.CrystalStorage]: 'crystalStorage',
     [BuildingType.DeuteriumTank]: 'deuteriumTank',
     [BuildingType.DarkMatterCollector]: 'darkMatterCollector',
+    [BuildingType.DarkMatterTank]: 'darkMatterTank',
+    [BuildingType.MissileSilo]: 'missileSilo',
     [BuildingType.Terraformer]: 'terraformer',
     [BuildingType.LunarBase]: 'lunarBase',
     [BuildingType.SensorPhalanx]: 'sensorPhalanx',
     [BuildingType.JumpGate]: 'jumpGate',
-    [BuildingType.PlanetDestroyerFactory]: 'planetDestroyerFactory'
+    [BuildingType.PlanetDestroyerFactory]: 'planetDestroyerFactory',
+    [BuildingType.GeoResearchStation]: 'geoResearchStation',
+    [BuildingType.DeepDrillingFacility]: 'deepDrillingFacility'
   }
 
   // 舰船类型枚举值到翻译键的映射
@@ -46,11 +52,15 @@ export const useGameConfig = () => {
     [ShipType.HeavyFighter]: 'heavyFighter',
     [ShipType.Cruiser]: 'cruiser',
     [ShipType.Battleship]: 'battleship',
+    [ShipType.Battlecruiser]: 'battlecruiser',
+    [ShipType.Bomber]: 'bomber',
+    [ShipType.Destroyer]: 'destroyer',
     [ShipType.SmallCargo]: 'smallCargo',
     [ShipType.LargeCargo]: 'largeCargo',
     [ShipType.ColonyShip]: 'colonyShip',
     [ShipType.Recycler]: 'recycler',
     [ShipType.EspionageProbe]: 'espionageProbe',
+    [ShipType.SolarSatellite]: 'solarSatellite',
     [ShipType.DarkMatterHarvester]: 'darkMatterHarvester',
     [ShipType.Deathstar]: 'deathstar'
   }
@@ -65,6 +75,8 @@ export const useGameConfig = () => {
     [DefenseType.PlasmaTurret]: 'plasmaTurret',
     [DefenseType.SmallShieldDome]: 'smallShieldDome',
     [DefenseType.LargeShieldDome]: 'largeShieldDome',
+    [DefenseType.AntiBallisticMissile]: 'antiBallisticMissile',
+    [DefenseType.InterplanetaryMissile]: 'interplanetaryMissile',
     [DefenseType.PlanetaryShield]: 'planetaryShield'
   }
 
@@ -76,12 +88,19 @@ export const useGameConfig = () => {
     [TechnologyType.HyperspaceTechnology]: 'hyperspaceTechnology',
     [TechnologyType.PlasmaTechnology]: 'plasmaTechnology',
     [TechnologyType.ComputerTechnology]: 'computerTechnology',
+    [TechnologyType.EspionageTechnology]: 'espionageTechnology',
+    [TechnologyType.WeaponsTechnology]: 'weaponsTechnology',
+    [TechnologyType.ShieldingTechnology]: 'shieldingTechnology',
+    [TechnologyType.ArmourTechnology]: 'armourTechnology',
+    [TechnologyType.Astrophysics]: 'astrophysics',
+    [TechnologyType.GravitonTechnology]: 'gravitonTechnology',
     [TechnologyType.CombustionDrive]: 'combustionDrive',
     [TechnologyType.ImpulseDrive]: 'impulseDrive',
     [TechnologyType.HyperspaceDrive]: 'hyperspaceDrive',
     [TechnologyType.DarkMatterTechnology]: 'darkMatterTechnology',
     [TechnologyType.TerraformingTechnology]: 'terraformingTechnology',
-    [TechnologyType.PlanetDestructionTech]: 'planetDestructionTech'
+    [TechnologyType.PlanetDestructionTech]: 'planetDestructionTech',
+    [TechnologyType.MiningTechnology]: 'miningTechnology'
   }
 
   // 军官类型枚举值到翻译键的映射

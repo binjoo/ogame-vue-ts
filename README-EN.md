@@ -5,13 +5,11 @@
 
   A modern of the classic OGame space strategy game, built with Vue 3 and TypeScript.
 
-  [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-  [![Vue 3](https://img.shields.io/badge/Vue-3.5-brightgreen.svg)](https://vuejs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-  [![Vite](https://img.shields.io/badge/Vite-7.2-646CFF.svg)](https://vitejs.dev/)
-  [![Go](https://img.shields.io/badge/Go-1.25-79D4FD.svg)](https://golang.org/)
+  [![GitHub Release](https://img.shields.io/github/v/release/setube/ogame-vue-ts?style=flat&logo=github&label=Release)](https://github.com/setube/ogame-vue-ts/releases/latest)
+  [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0)
+  [![Tap Tap](https://img.shields.io/badge/TapTap-OGame%20Vue%20Ts-18d6e0)](https://www.taptap.cn/app/801190)
 
-  [简体中文](README.md) | English
+  [简体中文](README.md)| [繁體中文](README-zh-TW.md) | English  | [Deutsch](README-DE.md) | [Русский](README-RU.md) | [Español](README-ES.md) | [한국어](README-KO.md) | [日本語](README-JA.md)
 
 </div>
 
@@ -21,7 +19,6 @@ OGame Vue TS is a single-player, browser-based space strategy game inspired by t
 
 ## Features
 
-- **Multi-language Support** - Available in 6 languages: English, Chinese (Simplified & Traditional), German, Russian, and Korean
 - **Building Management** - Construct and upgrade various buildings on planets and moons
 - **Research Technologies** - Unlock advanced technologies to enhance your empire
 - **Fleet Management** - Build ships, send missions, and engage in tactical space battles
@@ -36,46 +33,24 @@ OGame Vue TS is a single-player, browser-based space strategy game inspired by t
 
 ## Tech Stack
 
-- **Frontend Framework:** [Vue 3](https://vuejs.org/) with Composition API (`<script setup>`)
-- **Language:** [TypeScript](https://www.typescriptlang.org/) with strict type checking
-- **Build Tool:** [Vite](https://vitejs.dev/) (Custom Rolldown-Vite 7.2.5)、[Golang](https://golang.org/)(Building cross-platform Web server.)、[Electron](https://www.electronjs.org/)(Building cross-platform visual interfaces)
-- **State Management:** [Pinia](https://pinia.vuejs.org/) with persisted state plugin
-- **Routing:** [Vue Router 4](https://router.vuejs.org/)
-- **UI Components:** [shadcn-vue](https://www.shadcn-vue.com/) (New York style)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) with CSS variables
-- **Icons:** [Lucide Vue Next](https://lucide.dev/)
+- **Frontend Framework:** [Vue 3](https://vuejs.org) with Composition API (`<script setup>`)
+- **Language:** [TypeScript](https://www.typescriptlang.org) with strict type checking
+- **Build Tool:** [Vite](https://vitejs.dev) (Custom Rolldown-Vite 7.2.5)、[Golang](https://golang.org)(Building cross-platform Web server.)、[Electron](https://www.electronjs.org)(Building cross-platform visual interfaces)
+- **State Management:** [Pinia](https://pinia.vuejs.org) with persisted state plugin
+- **Routing:** [Vue Router 4](https://router.vuejs.org)
+- **UI Components:** [shadcn-vue](https://www.shadcn-vue.com) (New York style)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com) with CSS variables
+- **Icons:** [Lucide Vue Next](https://lucide.dev)
 - **Animations:** [tw-animate-css](https://www.npmjs.com/package/tw-animate-css)
 - **Internationalization:** Custom i18n implementation
 
 ## Quick Start
 
-### Download Build Product
-
-#### Server version
-
-[Windows](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-windows-amd64.exe)
-
-[Linux amd64](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-linux-amd64)
-
-[Linux arm64](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-linux-arm64)
-
-[MacOS Intel](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-macos-amd64)
-
-[MacOS](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/ogame-macos-arm64)
-
-#### Desktop version
-
-[Windows](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame.Setup.exe)
-
-[Ubuntu](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame.AppImage)
-
-[MacOS](https://github.com/coolxitech/ogame-vue-ts/releases/latest/download/OGame-mac.dmg)
-
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (version 18 or higher recommended)
-- [pnpm](https://pnpm.io/) (version 10.13.1 or higher)
-- [Go](https://golang.org/) (version 1.21 or higher recommended) (optional for binary builds)
+- [Node.js](https://nodejs.org) (version 18 or higher recommended)
+- [pnpm](https://pnpm.io) (version 10.13.1 or higher)
+- [Go](https://golang.org) (version 1.21 or higher recommended) (optional for binary builds)
 
 ### Installation
 
@@ -109,98 +84,6 @@ pnpm build
 pnpm preview
 ```
 
-## Project Structure
-
-```
-ogame-vue-ts/
-├── public/               # Static assets
-│   └── logo.svg         # Application logo
-├── src/
-│   ├── assets/          # Dynamic assets
-│   ├── components/      # Vue components
-│   │   └── ui/         # shadcn-vue UI components
-│   ├── composables/    # Vue composables
-│   ├── config/         # Game configuration
-│   ├── lib/            # Utility libraries
-│   ├── locales/        # i18n translation files
-│   ├── logic/          # Game logic modules
-│   │   ├── buildingLogic.ts
-│   │   ├── buildingValidation.ts
-│   │   ├── fleetLogic.ts
-│   │   ├── moonLogic.ts
-│   │   ├── moonValidation.ts
-│   │   ├── researchLogic.ts
-│   │   ├── researchValidation.ts
-│   │   ├── shipLogic.ts
-│   │   └── shipValidation.ts
-│   ├── router/         # Vue Router configuration
-│   ├── stores/         # Pinia state stores
-│   ├── types/          # TypeScript type definitions
-│   ├── utils/          # Utility functions
-│   ├── views/          # Page components
-│   │   ├── OverviewView.vue
-│   │   ├── BuildingsView.vue
-│   │   ├── ResearchView.vue
-│   │   ├── ShipyardView.vue
-│   │   ├── DefenseView.vue
-│   │   ├── FleetView.vue
-│   │   ├── GalaxyView.vue
-│   │   ├── OfficersView.vue
-│   │   ├── BattleSimulatorView.vue
-│   │   ├── MessagesView.vue
-│   │   └── SettingsView.vue
-│   ├── App.vue         # Root component
-│   ├── main.ts         # Application entry point
-│   └── style.css       # Global styles
-├── .github/
-│   └── ISSUE_TEMPLATE/ # GitHub issue templates
-├── LICENSE             # CC BY-NC 4.0 License
-├── package.json        # Project dependencies
-├── tsconfig.json       # TypeScript configuration
-└── vite.config.ts      # Vite configuration
-```
-
-## Available Languages
-
-- 🇺🇸 English
-- 🇨🇳 简体中文 (Simplified Chinese)
-- 🇹🇼 繁體中文 (Traditional Chinese)
-- 🇩🇪 Deutsch (German)
-- 🇷🇺 Русский (Russian)
-- 🇰🇷 한국어 (Korean)
-
-## Game Features
-
-### Resource Management
-- **Metal** - Primary construction material
-- **Crystal** - Advanced technology component
-- **Deuterium** - Fuel and research resource
-- **Dark Matter** - Premium resource
-- **Energy** - Powers your facilities
-
-### Building Types
-- **Resource Buildings** - Metal Mine, Crystal Mine, Deuterium Synthesizer, Solar Plant
-- **Facilities** - Robotics Factory, Shipyard, Research Lab, Storage facilities
-- **Special Buildings** - Nanite Factory, Terraformer, and more
-
-### Technologies
-- **Energy Technology** - Improves energy efficiency
-- **Laser Technology** - Enhances weapon systems
-- **Ion Technology** - Advanced propulsion and weapons
-- **Hyperspace Technology** - Enables faster travel
-- **Plasma Technology** - Ultimate weapon systems
-- And many more...
-
-### Ship Classes
-- **Civil Ships** - Small/Large Cargo, Colony Ship, Recycler
-- **Combat Ships** - Light/Heavy Fighter, Cruiser, Battleship, Bomber
-- **Special Ships** - Deathstar, Battlecruiser, Destroyer
-
-### Defense Systems
-- Rocket Launcher, Light/Heavy Laser, Gauss Cannon
-- Ion Cannon, Plasma Turret
-- Small/Large Shield Dome
-
 ## Data Security
 
 All game data is automatically encrypted using AES encryption before being stored in your browser's local storage. Your game progress is secure and private.
@@ -213,16 +96,9 @@ The application supports full theme customization through Tailwind CSS variables
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
 
-### Issue Templates
-We provide the following issue templates in both Chinese and English:
-- Bug Report
-- Feature Request
-- Documentation Improvement
-- eedback & Suggestion
-
 ## License
 
-This work is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/).
+This work is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0).
 
 ### You are free to:
 - **Share** — copy and redistribute the material in any medium or format
@@ -236,7 +112,7 @@ This work is licensed under the [Creative Commons Attribution-NonCommercial 4.0 
 
 ## Acknowledgments
 
-This project is inspired by the original [OGame](https://ogame.org/) browser game. All game mechanics and design elements are reimplemented for educational and entertainment purposes.
+This project is inspired by the original [OGame](https://ogame.org) browser game. All game mechanics and design elements are reimplemented for educational and entertainment purposes.
 
 ## Disclaimer
 
@@ -245,7 +121,7 @@ This project is not affiliated with, endorsed by, or connected to Gameforge AG o
 ---
 
 <div align="center">
-  Made with ❤️ by Jun Qian
+  Made with ❤️ by <a href="https://github.com/setube">setube</a>
   <br>
   © 2025 - All rights reserved (except those granted by CC BY-NC 4.0 License)
 </div>
